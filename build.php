@@ -7,6 +7,8 @@ if (!isset($dsn) || !isset($dbuser) || !isset($dbpass)) {
     exit(1);
 }
 
+//getMostRecentDump();exit();
+
 $pdo = new PDO($dsn, $dbuser, $dbpass);
 
 
@@ -45,13 +47,17 @@ $footer = $twig->render('footer.html', array('now' => date('j F, Y'),));
 file_put_contents($outDir . '/index.html', $header . $list . $footer);
 echo "done.\n";
 
-
 // End
 
+/**
+ * Functions only beyond here.
+ */
 
-/* Functions only beyond here. */
-/******************************************************************************/
-
+/**
+ * Get a list of validated works.
+ * @param \PDO $pdo
+ * @return array
+ */
 function getValidatedWorks($pdo) {
 //    $main_ns_id = 0;
 //    $index_ns_id = 106;
@@ -134,12 +140,6 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array())
         $catList = array_map('array_unique', $catList);
         //sort($catList[$cat]);
     }
-    // Remove duplicates. Probably inefficient; do this earlier.
-//    $out = array();
-//    foreach ($catList as $cat => $children) {
-//        $out[$cat] = array_unique($children);
-//    }
-//    $catList = $out;
     return array_map('array_unique', $catList);
 }
 
@@ -213,63 +213,21 @@ function recurse_copy($src, $dst) {
     closedir($dir);
 }
 
-//$newTree = printCatTree($catTree, array());
-//$test = array(
-//    'Category:a thing' => array(
-//        'Category:Works by date' => array(
-//            'Category:Works' => array(
-//                'Category:Categories' => FALSE,
-//            )
-//        ),
-//        'Category:Works by length' => array(
-//            'Category:Works' => array(
-//                'Category:Categories' => FALSE,
-//            )
-//        )
-//    )
-//);
-//print_r(printCatTree('root', $test));
+function getMostRecentDump() {
+    $abstractUrl = 'https://dumps.wikimedia.org/enwikisource/latest/enwikisource-latest-abstract.xml-rss.xml';
+    $feed = file_get_contents($abstractUrl);
+    if ($feed === FALSE) {
+        return FALSE;
+    }
+    $xml = simplexml_load_string($feed);
+    $pubDate = $xml->channel->item->pubDate;
+    $dateStr = date('Ymd', strtotime($pubDate));
 
-/**
- * Going down:
- * loop through each cat, storing it alongside its parent (in $progress)
- */
-//function printCatTree($parent = FALSE, $catTree, $progress = array(), $result = array()) {
-//    echo "-------------\n";
-//    if ($parent !== FALSE) {
-//        foreach ($catTree as $catTitle => $catSubtree) {
-//            $progress[$catTitle] = array($parent, printCatTree($catTitle, $catSubtree));
-//        }
-//        return $pro
-//    }
-//    if (isset($catTree['Category:Categories'])) {
-//        echo "At a leaf\n";
-//        return array($parent => printCatTree($parent, $catTree));
-//    }
-//}
-//$result = array();
-//foreach ($test as $key => $value) {
-//    $result = build(flatten(array($key => $value)), $result);
-//}
-//print_r($result);
-//
-//function flatten(array $array) {
-//    $key = array(key($array));
-//    $val = current($array);
-//    if (is_array($val)) {
-//        $key = array_merge(flatten($val), $key);
-//    }
-//    return $key;
-//}
-//
-//function build(array $path, array $result) {
-//    $key = array_shift($path);
-//    if (!isset($result[$key])) {
-//        $result[$key] = $path ? array() : null;
-//    }
-//    if ($path) {
-//        $result[$key] = build($path, $result[$key]);
-//    }
-//    return $result;
-//}
-
+    // Download table dumps.
+    $baseUrl = 'https://dumps.wikimedia.org/enwikisource/';
+    $tables = array('page', 'categorylinks', 'pagelinks');
+    foreach ($tables as $table) {
+        $url = "$baseUrl$dateStr/enwikisource-$dateStr-$table.sql.gz";
+        echo "$url\n";
+    }
+}
