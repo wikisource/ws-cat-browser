@@ -1,0 +1,17 @@
+{
+    "name": "samwilson/wikisource-cat-browser",
+    "type": "project",
+    "description": "Wikisource category browser, showing all validated works.",
+    "license": "MIT",
+    "homepage": "https://github.com/samwilson/wikisource-cat-browser",
+    "authors": [
+        {
+            "name": "Sam Wilson",
+            "email": "sam@samwilson.id.au",
+            "homepage": "http://samwilson.id.au"
+        }
+    ],
+    "require": {
+        "twig/twig": "~1.0"
+    }
+}

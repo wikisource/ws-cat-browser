@@ -1,0 +1,20 @@
+                <p>
+                    Last updated {{ now }}.
+                    For more information please contact <a href="https://en.wikisource.org/wiki/User:Samwilson">[[User:Samwilson]]</a>.
+                </p>
+            </div>
+        </div>
+
+        <script src="js/vendor/jquery.js"></script>
+        <script src="js/foundation.min.js"></script>
+        <script>
+        $(document).foundation();
+        $(function() {
+            $("ol.c ol").hide();
+            $("ol.c li span").on("click", function() {
+                $(this).next().toggle();
+            });
+        });
+        </script>
+    </body>
+</html>
