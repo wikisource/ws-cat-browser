@@ -1,8 +1,0 @@
-ol.c { 
-    border-left: thin solid lightblue;
-    list-style-type: none;
-    padding-left: 0.3em;
-}
-ol.c span {
-    cursor:ns-resize
-}

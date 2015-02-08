@@ -1,0 +1,73 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Wikisource (All Validated Works)</title>
+        <link rel="stylesheet" href="css/foundation.min.css" />
+        <link rel="stylesheet" href="css/style.css" />
+        <script src="js/modernizr.js"></script>
+    </head>
+    <body>
+
+        <div class="row">
+            <div class="large-12 columns">
+                <h1>Wikisource <small>(All Validated Works)</small></h1>
+                <p>
+                    This page presents the categorisation of the <span id="total-works">x</span> works
+                    on the <a href="https://en.wikisource.org/">English Wikisource</a>
+                    that are categorised, backed by scans,
+                    and have been validated (i.e. proofread by at least two contributors).
+                </p>
+                <ol class="c" id="catlist"></ol>
+                <p>
+                    For more information please see
+                    <a href="https://github.com/samwilson/wikisource-cat-browser">the code</a> on Github
+                    or contact <a href="https://en.wikisource.org/wiki/User:Samwilson">[[User:Samwilson]]</a>.
+                </p>
+            </div>
+        </div>
+
+        <script src="js/jquery.js"></script>
+        <script src="js/foundation.min.js"></script>
+        <script>
+            $(document).foundation();
+            $(function() {
+                $.get("categories.json", null, function(allCats){
+                    var tot = 0;
+                    $.each(allCats, function(i, cat){
+                        tot += cat.length;
+                    });
+                    $("#total-works").text(tot);
+                    addCats(allCats, $("#catlist"), allCats["Category:Categories"]);
+                });
+            });
+            function addCats(allCats, $parent, cat) {
+                $.each(cat, function(i, subcat){
+                    var title = subcat.replace(/_/g, " ");
+                    if (subcat.substr(0, 9)=="Category:") {
+                        title = title.substr(9);
+                    } else {
+                        title = "<a href='https://en.wikisource.org/wiki/"+subcat+"' title='View on Wikisource'>"+title+"</a>"
+                            + "<a href='http://wsexport.wmflabs.org/tool/book.php?lang=en&format=epub&page="+subcat+"'>"
+                            + " <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/15px-EPUB_silk_icon.svg.png'"
+                            + "     title='Download EPUB' />"
+                            + "</a>";
+                    }
+                    var $newItem = $("<li class='c'><span>"+title+"</span><ol class='c'></ol></li>");
+                    $parent.append($newItem);
+                    $newItem.find("span").on("click", function(){
+                        var $sublist = $(this).next("ol");
+                        if ($sublist.is(":empty")) {
+                            $(this).addClass("open").removeClass("closed");
+                            addCats(allCats, $sublist, allCats[subcat]);
+                        } else {
+                            $(this).addClass("closed").removeClass("open");
+                            $sublist.children().remove();
+                        }
+                    })
+                });
+            }
+        </script>
+    </body>
+</html>
