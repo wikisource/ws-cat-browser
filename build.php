@@ -1,8 +1,8 @@
 <?php
 
 if (php_sapi_name()!='cli') {
-    echo 'This script should only be called from the command line.';
-    exit(1);
+    echo date('Y-m-d H:i', filemtime('categories.json'));
+    exit(0);
 }
 
 require 'config.php';

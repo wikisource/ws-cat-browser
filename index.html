@@ -20,6 +20,7 @@
                     and have been validated (i.e. proofread by at least two contributors).
                 </p>
                 <ol class="c" id="catlist"></ol>
+                <p>This list was last updated at: <span id="last-mod">y</span>.</p>
                 <p>
                     For more information please see
                     <a href="https://github.com/samwilson/wikisource-cat-browser">the code</a> on Github
@@ -37,11 +38,20 @@
             $(document).foundation();
             $(function() {
                 $.get("categories.json", null, function(allCats){
+
+                    // Total count.
                     var tot = 0;
                     $.each(allCats, function(i, cat){
                         tot += cat.length;
                     });
                     $("#total-works").text(tot);
+
+                    // Last modified date.
+                    $.get("build.php", null, function(date){
+                        $("#last-mod").text(date);
+                    });
+
+                    // Add categories.
                     addCats(allCats, $("#catlist"), allCats["Category:Categories"]);
                 });
             });
