@@ -1,6 +1,10 @@
 <?php
 
-require 'vendor/autoload.php';
+if (php_sapi_name()!='cli') {
+    echo 'This script should only be called from the command line.';
+    exit(1);
+}
+
 require 'config.php';
 if (!isset($dsn) || !isset($dbuser) || !isset($dbpass)) {
     echo 'config.php must define $dsn, $dbuser, and $dbpass' . "\n";
@@ -46,9 +50,6 @@ exit(0);
  * @return array
  */
 function getValidatedWorks($pdo) {
-//    $main_ns_id = 0;
-//    $index_ns_id = 106;
-//    $validatedCatName = 'Index_Validated';
     $sql = 'SELECT '
             . '   indexpage.page_title AS indextitle,'
             . '   workpage.page_title AS worktitle'
@@ -63,37 +64,18 @@ function getValidatedWorks($pdo) {
             . '   AND indexpage.page_namespace = 106 '
             . '   AND cl_to = "Index_Validated" ';
     $stmt = $pdo->query($sql);
-    //$stmt->execute();
-    //var_dump($pdo->errorInfo());
-//    $stmt->execute(array(
-////        ':main_ns_id1' => $main_ns_id,
-////        ':main_ns_id2' => $main_ns_id,
-////        ':index_ns_id' => $index_ns_id,
-////        ':validatedCatName' => $validatedCatName
-//    ));
     $out = array();
     foreach ($stmt->fetchAll() as $res) {
         $out[$res['indextitle']] = $res['worktitle'];
     }
-    //var_dump($out);
     return $out;
 }
 
 function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array()) {
-    //echo "Getting categories of $baseCat\n";
-
     $cats = getCats($pdo, $baseCat, $ns);
-
-//    if (in_array('Categories', $cats)) {
-//        var_dump($baseCat);
-//        print_r($cats);
-//        exit();
-//    }
-
     if (empty($cats)) {
-        return $catList; //array();
+        return $catList;
     }
-
     if ($ns == 0) {
         $tracker = array();
     }
@@ -108,13 +90,9 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array())
             exit(1);
         }
         array_push($tracker, $tracker_tag);
-        //echo memory_get_usage()."\n";
         // Add all of $cat's parents to the $catList.
-        //if ($cat != 'Categories') {
         $superCats = getAllCats($pdo, $cat, 14, $catList, $tracker);
         $catList = array_merge_recursive($catList, $superCats);
-        //}
-        //var_dump($superCats);
         // Initialise $cat as a parent if it's not there yet.
         if (!isset($catList[$cat])) {
             $catList[$cat] = array();
@@ -123,9 +101,7 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array())
         if (!in_array($baseCat, $catList[$cat])) {
             array_push($catList[$cat], $baseCat);
         }
-
         $catList = array_map('array_unique', $catList);
-        //sort($catList[$cat]);
     }
     return array_map('array_unique', $catList);
 }

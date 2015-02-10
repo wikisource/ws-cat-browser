@@ -28,6 +28,9 @@
             </div>
         </div>
 
+        <div class="hide">
+            <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/15px-EPUB_silk_icon.svg.png' />
+        </div>
         <script src="js/jquery.js"></script>
         <script src="js/foundation.min.js"></script>
         <script>
@@ -46,15 +49,15 @@
                 $.each(cat, function(i, subcat){
                     var title = subcat.replace(/_/g, " ");
                     if (subcat.substr(0, 9)=="Category:") {
-                        title = title.substr(9);
+                        title = '<span>'+title.substr(9)+'</span>';
                     } else {
                         title = "<a href='https://en.wikisource.org/wiki/"+subcat+"' title='View on Wikisource'>"+title+"</a>"
-                            + "<a href='http://wsexport.wmflabs.org/tool/book.php?lang=en&format=epub&page="+subcat+"'>"
+                            + "<a href='http://wsexport.wmflabs.org/tool/book.php?lang=en&format=epub&page="+subcat+"' class='epub'>"
                             + " <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/15px-EPUB_silk_icon.svg.png'"
                             + "     title='Download EPUB' />"
                             + "</a>";
                     }
-                    var $newItem = $("<li class='c'><span>"+title+"</span><ol class='c'></ol></li>");
+                    var $newItem = $("<li class='c'>"+title+"<ol class='c'></ol></li>");
                     $parent.append($newItem);
                     $newItem.find("span").on("click", function(){
                         var $sublist = $(this).next("ol");

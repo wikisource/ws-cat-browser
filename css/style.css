@@ -6,3 +6,5 @@ ol.c {
 ol.c span { cursor:s-resize }
 ol.c span.open { cursor:n-resize }
 ol.c span:hover { background-color:#efefef }
+ol.c a:hover { text-decoration:underline }
+ol.c a.epub:hover { text-decoration:none }
