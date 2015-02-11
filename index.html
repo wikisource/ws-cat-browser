@@ -19,8 +19,12 @@
                     that are categorised, backed by scans,
                     and have been validated (i.e. proofread by at least two contributors).
                 </p>
-                <ol class="c" id="catlist"></ol>
-                <p>This list was last updated at: <span id="last-mod">y</span>.</p>
+                <p class="loading"><img src="img/loading.gif" /> Categories loading, please wait...</p>
+                <ol class="c hide" id="catlist"></ol>
+                <p>
+                    This list was last updated at:
+                    <span id="last-mod">y</span> <a href="http://time.is/UTC">UTC</a>.
+                </p>
                 <p>
                     For more information please see
                     <a href="https://github.com/samwilson/wikisource-cat-browser">the code</a> on Github
@@ -38,6 +42,9 @@
             $(document).foundation();
             $(function() {
                 $.get("categories.json", null, function(allCats){
+                    $(".loading").fadeOut(400, function(){
+                        $("#catlist").removeClass("hide").fadeIn(400);
+                    });
 
                     // Total count.
                     var tot = 0;
