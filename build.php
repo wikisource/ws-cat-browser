@@ -1,7 +1,9 @@
 <?php
 
+$catFile = __DIR__.'/categories.json';
+
 if (php_sapi_name()!='cli') {
-    echo date('Y-m-d H:i', filemtime('categories.json'));
+    echo date('Y-m-d H:i', filemtime($catFile));
     exit(0);
 }
 
@@ -34,8 +36,8 @@ foreach ($allCats as $cat => $cats) {
 echo "done\n";
 
 
-echo "Writing categories.json\n";
-file_put_contents('categories.json', json_encode($allCats));
+echo "Writing $catFile\n";
+file_put_contents($catFile, json_encode($allCats));
 exit(0);
 // End
 
