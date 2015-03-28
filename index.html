@@ -51,8 +51,6 @@
 
                     // Last modified date.
                     $.get("build.php", null, function(metadata){
-                        console.log(metadata);
-                        console.log(metadata.last_modified);
                         $("#last-mod").text(metadata.last_modified);
                         $("#total-works").text(metadata.works_count);
                     });
