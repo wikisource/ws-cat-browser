@@ -28,7 +28,9 @@
                 <p>
                     For more information please see
                     <a href="https://github.com/samwilson/wikisource-cat-browser">the code</a> on Github
-                    or contact <a href="https://en.wikisource.org/wiki/User:Samwilson">[[User:Samwilson]]</a>.
+                    or contact <a href="https://en.wikisource.org/wiki/User:Samwilson">User:Samwilson</a>.
+                    The above data is available in <a href="works.json"><tt>works.json</tt></a>
+                    and <a href="categories.json"><tt>categories.json</tt></a>.
                 </p>
             </div>
         </div>
@@ -41,21 +43,18 @@
         <script>
             $(document).foundation();
             $(function() {
+                // Get categories.
                 $.get("categories.json", null, function(allCats){
                     $(".loading").fadeOut(400, function(){
                         $("#catlist").removeClass("hide").fadeIn(400);
                     });
 
-                    // Total count.
-                    var tot = 0;
-                    $.each(allCats, function(i, cat){
-                        tot += cat.length;
-                    });
-                    $("#total-works").text(tot);
-
                     // Last modified date.
-                    $.get("build.php", null, function(date){
-                        $("#last-mod").text(date);
+                    $.get("build.php", null, function(metadata){
+                        console.log(metadata);
+                        console.log(metadata.last_modified);
+                        $("#last-mod").text(metadata.last_modified);
+                        $("#total-works").text(metadata.works_count);
                     });
 
                     // Add categories.

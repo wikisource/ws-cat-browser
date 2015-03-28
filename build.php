@@ -1,9 +1,15 @@
 <?php
 
 $catFile = __DIR__.'/categories.json';
+$worksFile = __DIR__.'/works.json';
 
 if (php_sapi_name()!='cli') {
-    echo date('Y-m-d H:i', filemtime($catFile));
+    header("Content-Type:application/json");
+    $metadata = array(
+        'works_count' => count((array)json_decode(file_get_contents($worksFile))),
+        'last_modified' => date('Y-m-d H:i', filemtime($catFile)),
+    );
+    echo json_encode($metadata);
     exit(0);
 }
 
@@ -17,6 +23,7 @@ $pdo = new PDO($dsn, $dbuser, $dbpass);
 
 echo "Getting list of validated works . . . ";
 $validatedWorks = getValidatedWorks($pdo);
+file_put_contents($worksFile, json_encode($validatedWorks));
 echo "done\n";
 
 
