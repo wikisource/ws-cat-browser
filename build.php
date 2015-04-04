@@ -43,9 +43,17 @@ foreach ($allCats as $cat => $cats) {
 echo "done\n";
 
 
-echo "Writing $catFile\n";
-file_put_contents($catFile, json_encode($allCats));
-exit(0);
+// Make sure the category list was successfully built before replacing the old
+// JSON file.
+if (count($allCats) > 0) {
+    echo "Writing $catFile\n";
+    file_put_contents($catFile, json_encode($allCats));
+    exit(0);
+} else {
+    echo 'No category list built! $allCats was:';
+    print_r($allCats);
+    exit(1);
+}
 // End
 
 
