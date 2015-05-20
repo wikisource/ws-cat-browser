@@ -12,3 +12,6 @@ from https://dumps.wikimedia.org/enwikisource/
 
 Then set `$dsn`, `$dbuser`, and `$dbpass` in `config.php` (copy it from `config_dist.php`)
 and run `php build.php`.
+
+## Tracking
+At some point, this will track changes (or at least additions) of validated works. For now, the `data/works.json` is manually updated with a [formatted](http://jsonformatter.curiousconcept.com/) version of the generated `works.json` file, so added and removed entries can be tracked.
