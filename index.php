@@ -2,7 +2,7 @@
 require 'config.php';
 
 $lang = (isset($_GET['lang'])) ? $_GET['lang'] : 'en';
-if ( !in_array($lang, array_keys($dbs))) {
+if ( !array_key_exists($lang, $dbs)) {
     $err = "The language '$lang' has not yet been included. Please lodge an issue.";
 }
 $suffix = $lang=='en' ? '' : '_'.$lang;
