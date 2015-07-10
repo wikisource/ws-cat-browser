@@ -1,6 +1,7 @@
 /nbproject
 /vendor
 /config.php
-/categories.json
-/works.json
-
+/categories*.json
+/works*.json
+/dumps/
+/data/

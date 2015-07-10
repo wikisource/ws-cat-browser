@@ -1,72 +1,101 @@
 <?php
 
-$catFile = __DIR__.'/categories.json';
-$worksFile = __DIR__.'/works.json';
+require 'config.php';
+if (!isset($dbs) || !isset($dbuser) || !isset($dbpass)) {
+    echo 'config.php must define $dbs, $dbuser, and $dbpass' . "\n";
+    exit(1);
+}
 
-if (php_sapi_name()!='cli') {
+if (php_sapi_name() != 'cli') {
+    $lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
     header("Content-Type:application/json");
     $metadata = array(
-        'works_count' => count((array)json_decode(file_get_contents($worksFile))),
-        'last_modified' => date('Y-m-d H:i', filemtime($catFile)),
+        'works_count' => count((array)json_decode(file_get_contents(getWorksFile($lang)))),
+        'last_modified' => date('Y-m-d H:i', filemtime(getCatFile($lang))),
+        'category_label' => $dbs[$lang]['cat_label'],
+        'category_root' => $dbs[$lang]['cat_root'],
     );
     echo json_encode($metadata);
     exit(0);
 }
 
-require 'config.php';
-if (!isset($dsn) || !isset($dbuser) || !isset($dbpass)) {
-    echo 'config.php must define $dsn, $dbuser, and $dbpass' . "\n";
-    exit(1);
+foreach ($dbs as $lang => $info) {
+    $dsn = $info['dsn'];
+    $indexNs = $info['index_ns'];
+    $indexRoot = $info['index_root'];
+    $catLabel = $info['cat_label'];
+    $pdo = new PDO($dsn, $dbuser, $dbpass);
+    buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs );
 }
-$pdo = new PDO($dsn, $dbuser, $dbpass);
-
-
-echo "Getting list of validated works . . . ";
-$validatedWorks = getValidatedWorks($pdo);
-file_put_contents($worksFile, json_encode($validatedWorks));
-echo "done\n";
-
-
-echo "Getting category data . . . ";
-$allCats = array();
-foreach ($validatedWorks as $indexTitle => $workTitle) {
-    $catTree = getAllCats($pdo, $workTitle, 0);
-    $allCats = array_map('array_unique', array_merge_recursive($allCats, $catTree));
-}
-echo "done\n";
-
-
-echo "Sorting categories . . . ";
-foreach ($allCats as $cat => $cats) {
-    sort($allCats[$cat]);
-}
-echo "done\n";
-
-
-// Make sure the category list was successfully built before replacing the old
-// JSON file.
-if (count($allCats) > 0) {
-    echo "Writing $catFile\n";
-    file_put_contents($catFile, json_encode($allCats));
-    exit(0);
-} else {
-    echo 'No category list built! $allCats was:';
-    print_r($allCats);
-    exit(1);
-}
-// End
-
 
 /**
  * Functions only beyond here.
  */
 
 /**
+ * Get the name of the categories.json file.
+ * @param string $lang
+ * @return string
+ */
+function getCatFile($lang) {
+    $suffix = ( $lang == 'en') ? '' : '_'.$lang;
+    return __DIR__.'/categories'.$suffix.'.json';
+}
+
+/**
+ * Get the name of the categories.json file.
+ * @param string $lang
+ * @return string
+ */
+function getWorksFile($lang) {
+    $suffix = ( $lang == 'en') ? '' : '_'.$lang;
+    return __DIR__.'/works'.$suffix.'.json';
+}
+
+/**
+ * 
+ * @param \PDO $pdo
+ */
+function buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs ) {
+
+    echo "Getting list of validated works for '$lang' . . . ";
+    $validatedWorks = getValidatedWorks($pdo, $indexRoot, $indexNs);
+    file_put_contents(getWorksFile($lang), json_encode($validatedWorks));
+    echo "done\n";
+
+    echo "Getting category data for '$lang' . . . ";
+    $allCats = array();
+    foreach ($validatedWorks as $indexTitle => $workTitle) {
+        $catTree = getAllCats($pdo, $workTitle, 0, array(), array(), $catLabel);
+        $allCats = array_map('array_unique', array_merge_recursive($allCats, $catTree));
+    }
+    echo "done\n";
+
+    echo "Sorting categories for '$lang' . . . ";
+    foreach ($allCats as $cat => $cats) {
+        sort($allCats[$cat]);
+    }
+    echo "done\n";
+
+    // Make sure the category list was successfully built before replacing the old JSON file.
+    if (count($allCats) > 0) {
+        $catFile = getCatFile($lang);
+        echo "Writing $catFile\n";
+        file_put_contents($catFile, json_encode($allCats));
+        return true;
+    } else {
+        echo 'No category list built! $allCats was:';
+        print_r($allCats);
+        exit(1);
+    }
+}
+
+/**
  * Get a list of validated works.
  * @param \PDO $pdo
  * @return array
  */
-function getValidatedWorks($pdo) {
+function getValidatedWorks($pdo, $indexRoot, $indexNs) {
     $sql = 'SELECT '
             . '   indexpage.page_title AS indextitle,'
             . '   workpage.page_title AS worktitle'
@@ -78,8 +107,8 @@ function getValidatedWorks($pdo) {
             . '   workpage.page_title NOT LIKE "%/%" '
             . '   AND pl_namespace = 0 '
             . '   AND workpage.page_namespace = 0'
-            . '   AND indexpage.page_namespace = 106 '
-            . '   AND cl_to = "Index_Validated" ';
+            . '   AND indexpage.page_namespace = '.$indexNs.' '
+            . '   AND cl_to = "'.$indexRoot.'"';
     $stmt = $pdo->query($sql);
     $out = array();
     foreach ($stmt->fetchAll() as $res) {
@@ -88,8 +117,8 @@ function getValidatedWorks($pdo) {
     return $out;
 }
 
-function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array()) {
-    $cats = getCats($pdo, $baseCat, $ns);
+function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array(), $catLabel) {
+    $cats = getCats($pdo, $baseCat, $ns, $catLabel);
     if (empty($cats)) {
         return $catList;
     }
@@ -108,7 +137,7 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array())
         }
         array_push($tracker, $tracker_tag);
         // Add all of $cat's parents to the $catList.
-        $superCats = getAllCats($pdo, $cat, 14, $catList, $tracker);
+        $superCats = getAllCats($pdo, $cat, 14, $catList, $tracker, $catLabel);
         $catList = array_merge_recursive($catList, $superCats);
         // Initialise $cat as a parent if it's not there yet.
         if (!isset($catList[$cat])) {
@@ -123,7 +152,7 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array())
     return array_map('array_unique', $catList);
 }
 
-function getCats($pdo, $baseCat, $ns) {
+function getCats($pdo, $baseCat, $ns, $catLabel = 'Category') {
     // Get the starting categories.
     $sql = 'SELECT cl_to AS catname FROM page '
             . '   JOIN categorylinks ON cl_from=page_id'
@@ -131,12 +160,12 @@ function getCats($pdo, $baseCat, $ns) {
             . '   AND page_namespace = :page_namespace ';
     $stmt = $pdo->prepare($sql);
     $stmt->execute(array(
-        ':page_title' => str_replace('Category:', '', $baseCat),
+        ':page_title' => str_replace($catLabel.':', '', $baseCat),
         ':page_namespace' => $ns,
     ));
     $cats = array();
     foreach ($stmt->fetchAll() as $cat) {
-        $cats[] = 'Category:' . $cat['catname'];
+        $cats[] = $catLabel . ':' . $cat['catname'];
     }
     return $cats;
 }
