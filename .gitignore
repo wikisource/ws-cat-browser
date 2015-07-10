@@ -3,5 +3,5 @@
 /config.php
 /categories*.json
 /works*.json
-/dumps/
-/data/
+/dumps
+/data
