@@ -13,9 +13,9 @@ $suffix = $lang=='en' ? '' : '_'.$lang;
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Wikisource (All Validated Works)</title>
-        <link rel="stylesheet" href="css/foundation.min.css" />
+        <link rel="stylesheet" href="//tools-static.wmflabs.org/cdnjs/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
         <link rel="stylesheet" href="css/style.css" />
-        <script src="js/modernizr.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     </head>
     <body>
 
@@ -67,8 +67,8 @@ $suffix = $lang=='en' ? '' : '_'.$lang;
         <div class="hide">
             <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/15px-EPUB_silk_icon.svg.png' />
         </div>
-        <script src="js/jquery.js"></script>
-        <script src="js/foundation.min.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
         <script src="js/app.js"></script>
         <script>
             var lang = '<?php echo $lang ?>';
