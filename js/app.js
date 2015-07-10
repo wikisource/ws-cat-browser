@@ -10,17 +10,14 @@ $(function() {
             $("#catlist").removeClass("hide").fadeIn(400);
         });
 
-        // Last modified date.
-        var catLabel;
+        // Get metadata.
         $.get("build.php?lang="+lang, null, function(metadata){
-            console.log(metadata);
             $("#last-mod").text(metadata.last_modified);
             $("#total-works").text(metadata.works_count);
 
-            catLabel = metadata.category_label;
-            catRoot = metadata.category_root;
             // Add categories.
-            console.log("getting "+catLabel+":"+catRoot);
+            var catLabel = metadata.category_label;
+            var catRoot = metadata.category_root;
             addCats(allCats, $("#catlist"), allCats[catLabel+":"+catRoot], catLabel);
         });
 
