@@ -161,9 +161,8 @@ function buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs ) {
         file_put_contents($catFile, json_encode($allCats));
         return true;
     } else {
-        echo 'No category list built! $allCats was:';
-        print_r($allCats);
-        exit(1);
+        echo "No validated works found for $lang!\n";
+        return false;
     }
 }
 
