@@ -209,7 +209,7 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array(),
         if (in_array($tracker_tag, $tracker)) {
             echo "A category loop has been detected.";
             print_r($tracker);
-            exit(1);
+            continue;
         }
         array_push($tracker, $tracker_tag);
         // Add all of $cat's parents to the $catList.
