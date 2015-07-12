@@ -1,5 +1,6 @@
 <?php
 require 'config.php';
+$siteInfo = json_decode(file_get_contents(__DIR__.'/sites.json'), true);
 ksort($siteInfo);
 $lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
 if ( !array_key_exists($lang, $siteInfo)) {

@@ -30,6 +30,12 @@ if (php_sapi_name() != 'cli') {
  */
 if (!isset($siteInfo)) {
     $siteInfo = getSiteInfo();
+    echo "Writing sites.json\n";
+    file_put_contents(__DIR__.'/sites.json', json_encode($siteInfo));
+    // Add the DSN.
+    foreach ($siteInfo as $lang => $info) {
+        $siteInfo[$lang]['dsn'] = "mysql:dbname={$lang}wikisource_p;host={$lang}wikisource.labsdb";
+    }
 }
 
 /*
@@ -62,7 +68,6 @@ function getSiteInfo() {
             $indexCat = substr($validatedCats[$site], strlen($catLabel)+1);
             // Put it all together, replacing spaces with underscores.
             $out[$lang] = array(
-                'dsn' => "mysql:dbname={$site}_p;host={$site}.labsdb",
                 'cat_label' => $catLabel,
                 'cat_root' => str_replace(' ', '_', $rootCat),
                 'index_ns' => $nsInfo['Index']['id'],
@@ -114,23 +119,13 @@ function siteLinks($item) {
 }
 
 /**
- * Get the name of the categories.json file.
+ * Get the name of a xxx_xx.json file.
  * @param string $lang
  * @return string
  */
-function getCatFile($lang) {
+function getDataFilename($name, $lang) {
     $suffix = ( $lang == 'en') ? '' : '_'.$lang;
-    return __DIR__.'/categories'.$suffix.'.json';
-}
-
-/**
- * Get the name of the categories.json file.
- * @param string $lang
- * @return string
- */
-function getWorksFile($lang) {
-    $suffix = ( $lang == 'en') ? '' : '_'.$lang;
-    return __DIR__.'/works'.$suffix.'.json';
+    return __DIR__.'/'.$name.$suffix.'.json';
 }
 
 /**
@@ -141,7 +136,7 @@ function buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs ) {
 
     echo "Getting list of validated works for '$lang' . . . ";
     $validatedWorks = getValidatedWorks($pdo, $indexRoot, $indexNs);
-    file_put_contents(getWorksFile($lang), json_encode($validatedWorks));
+    file_put_contents(getDataFilename('works', $lang), json_encode($validatedWorks));
     echo "done\n";
 
     echo "Getting category data for '$lang' . . . ";
@@ -160,7 +155,7 @@ function buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs ) {
 
     // Make sure the category list was successfully built before replacing the old JSON file.
     if (count($allCats) > 0) {
-        $catFile = getCatFile($lang);
+        $catFile = getDataFilename('categories', $lang);
         echo "Writing $catFile\n";
         file_put_contents($catFile, json_encode($allCats));
         return true;
