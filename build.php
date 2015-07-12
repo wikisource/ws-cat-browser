@@ -1,8 +1,8 @@
 <?php
 
 require 'config.php';
-if (!isset($dbs) || !isset($dbuser) || !isset($dbpass)) {
-    echo 'config.php must define $dbs, $dbuser, and $dbpass' . "\n";
+if (!isset($dbs) || !isset($dbuser) || !isset($dbpass) || !isset($wbapi) || !isset($wbitem)) {
+    echo 'config.php must define $dbs, $dbuser, $dbpass, $wbapi, and $wbitem' . "\n";
     exit(1);
 }
 
@@ -19,18 +19,58 @@ if (php_sapi_name() != 'cli') {
     exit(0);
 }
 
+$dbNames = array_map(function ($info) {
+    return $info['db_name'];
+}, $dbs);
+
+$indexRoots = getIndexRoots($wbapi, $wbitem, $dbNames);
 foreach ($dbs as $lang => $info) {
-    $dsn = $info['dsn'];
-    $indexNs = $info['index_ns'];
-    $indexRoot = $info['index_root'];
-    $catLabel = $info['cat_label'];
-    $pdo = new PDO($dsn, $dbuser, $dbpass);
-    buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs );
+    $dbName = $info['db_name'];
+    if (isset($indexRoots[$dbName])) {
+        $dsn = "mysql:dbname={$dbName}_p;host=$dbName.labsdb";
+        $indexNs = $info['index_ns'];
+        $catLabel = $info['cat_label'];
+        $pdo = new PDO($dsn, $dbuser, $dbpass);
+        buildOneLang( $pdo, $lang, $indexRoots[$dbName], $catLabel, $indexNs );
+    }
 }
 
 /**
  * Functions only beyond here.
  */
+
+/**
+ * Get the titles of the index categories.
+ * @param string $wbapi
+ * @param string $wbitem
+ * @param array $dbnames
+ * @return array
+ */
+function getIndexRoots($wbapi, $wbitem, $dbnames) {
+    $params = array(
+        'action' => 'wbgetentities',
+        'format' => 'json',
+        'ids' => $wbitem,
+        'props' => 'sitelinks',
+        'sitefilter' => implode('|', $dbnames)
+    );
+    $data = json_decode(file_get_contents($wbapi.'?'.http_build_query($params)), true);
+    $cats = array();
+    if (isset($data['entities']) && isset($data['entities'][$wbitem])) {
+        $item = $data['entities'][$wbitem];
+        if (isset($item['sitelinks'])) {
+            foreach ($item['sitelinks'] as $dbname => $sitelink) {
+                // Try to remove namespace
+                $parts = explode(':', $sitelink['title'], 2);
+                if (count($parts) === 2 && $parts[0] !== '' && $parts[1] !== '') {
+                    // Database fields use underscores
+                    $cats[$dbname] = str_replace(' ', '_', $parts[1]);
+                }
+            }
+        }
+    }
+    return $cats;
+}
 
 /**
  * Get the name of the categories.json file.
