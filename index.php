@@ -1,8 +1,8 @@
 <?php
 require 'config.php';
-ksort($dbs);
+ksort($siteInfo);
 $lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
-if ( !array_key_exists($lang, $dbs)) {
+if ( !array_key_exists($lang, $siteInfo)) {
     $err = "The language '$lang' has not yet been included. Please lodge an issue.";
     $lang = 'en';
 }
@@ -25,7 +25,7 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
 
                 <ul class="inline-list">
                     <li>Languages:</li>
-                    <?php foreach ($dbs as $l => $info): ?>
+                    <?php foreach ($siteInfo as $l => $info): ?>
                     <li>
                     <?php if ($lang == $l): ?>
                         <strong><?php echo $l ?></strong>

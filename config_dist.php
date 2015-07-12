@@ -4,24 +4,22 @@ $dbuser = '';
 
 $dbpass = '';
 
-$wbapi = 'https://www.wikidata.org/w/api.php';
-
-$wbitem = 'Q15634466';
-
-$dbs = array(
+$siteInfo = array(
 
     'en' => array(
-        'db_name'    => 'enwikisource',
+        'dsn'        => 'mysql:dbname=wikisource_en',
         'cat_label'  => 'Category',
         'cat_root'   => 'Categories',
         'index_ns'   => 106,
+        'index_cat' => 'Index_Validated',
     ),
 
     'it' => array(
-        'db_name'    => 'itwikisource',
+        'dsn'        => 'mysql:dbname=wikisource_it',
         'cat_label'  => 'Categoria',
         'cat_root'   => 'Categorie',
         'index_ns'   => 110,
+        'index_cat' => 'Pagine_indice_SAL_100%',
     ),
 
 );

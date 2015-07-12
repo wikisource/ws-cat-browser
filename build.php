@@ -1,72 +1,113 @@
 <?php
 
 require 'config.php';
-if (!isset($dbs) || !isset($dbuser) || !isset($dbpass) || !isset($wbapi) || !isset($wbitem)) {
-    echo 'config.php must define $dbs, $dbuser, $dbpass, $wbapi, and $wbitem' . "\n";
+if (!isset($dbuser) || !isset($dbpass)) {
+    echo 'config.php must define at least $dbuser and $dbpass' . "\n";
     exit(1);
 }
 
+/*
+ * Return some metadata if this is a web request.
+ */
 if (php_sapi_name() != 'cli') {
-    $lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
+    $lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
+    if (!array_key_exists($lang, $siteInfo)) {
+        $lang = 'en';
+    }
     header("Content-Type:application/json");
     $metadata = array(
         'works_count' => count((array)json_decode(file_get_contents(getWorksFile($lang)))),
         'last_modified' => date('Y-m-d H:i', filemtime(getCatFile($lang))),
-        'category_label' => $dbs[$lang]['cat_label'],
-        'category_root' => $dbs[$lang]['cat_root'],
+        'category_label' => $siteInfo[$lang]['cat_label'],
+        'category_root' => $siteInfo[$lang]['cat_root'],
     );
     echo json_encode($metadata);
     exit(0);
 }
 
-$dbNames = array_map(function ($info) {
-    return $info['db_name'];
-}, $dbs);
-
-$indexRoots = getIndexRoots($wbapi, $wbitem, $dbNames);
-foreach ($dbs as $lang => $info) {
-    $dbName = $info['db_name'];
-    if (isset($indexRoots[$dbName])) {
-        $dsn = "mysql:dbname={$dbName}_p;host=$dbName.labsdb";
-        $indexNs = $info['index_ns'];
-        $catLabel = $info['cat_label'];
-        $pdo = new PDO($dsn, $dbuser, $dbpass);
-        buildOneLang( $pdo, $lang, $indexRoots[$dbName], $catLabel, $indexNs );
-    }
+/*
+ * If no $siteInfo is provided in config.php, construct it here for all possible Wikisources.
+ */
+if (!isset($siteInfo)) {
+    $siteInfo = getSiteInfo();
 }
 
-/**
+/*
+ * For each site, build categories.json and works.json
+ */
+foreach ($siteInfo as $lang => $info) {
+    $pdo = new PDO($info['dsn'], $dbuser, $dbpass);
+    buildOneLang( $pdo, $lang, $info['index_cat'], $info['cat_label'], $info['index_ns'] );
+}
+
+/*
  * Functions only beyond here.
  */
 
+function getSiteInfo() {
+    echo "Getting site information . . . ";
+    $rootCatItem = 'Q1281';
+    $validatedCatItem = 'Q15634466';
+    $rootCats = siteLinks($rootCatItem);
+    $validatedCats = siteLinks($validatedCatItem);
+    $out = array();
+    foreach ($rootCats as $site => $rootCat) {
+        // If both a root cat and an Index cat exist.
+        if (isset($validatedCats[$site])) {
+            $lang = substr($site, 0, -strlen('wikisource'));
+            $nsInfo = getNamespaceInfo($lang);
+            $catLabel = $nsInfo['Category']['*'];
+            // Strip cat label from cats
+            $rootCat = substr($rootCat, strlen($catLabel)+1);
+            $indexCat = substr($validatedCats[$site], strlen($catLabel)+1);
+            // Put it all together, replacing spaces with underscores.
+            $out[$lang] = array(
+                'dsn' => "mysql:dbname={$site}_p;host={$site}.labsdb",
+                'cat_label' => $catLabel,
+                'cat_root' => str_replace(' ', '_', $rootCat),
+                'index_ns' => $nsInfo['Index']['id'],
+                'index_cat' => str_replace(' ', '_', $indexCat),
+            );
+        }
+    }
+    echo "done.\n";
+    return $out;
+}
+
+function getNamespaceInfo($lang) {
+    $url = "https://$lang.wikisource.org/w/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json";
+    $data = json_decode(file_get_contents($url), true);
+    if (!isset($data['query']['namespaces'])) {
+        return false;
+    }
+    $desired = array('Index', 'Category');
+    $out = array();
+    foreach($data['query']['namespaces'] as $ns) {
+        if (isset($ns['canonical']) && in_array($ns['canonical'], $desired)) {
+            $out[$ns['canonical']] = $ns;
+        }
+    }
+    return $out;
+}
+
 /**
- * Get the titles of the index categories.
- * @param string $wbapi
- * @param string $wbitem
- * @param array $dbnames
- * @return array
+ * 
+ * @param type $item
+ * @return type
  */
-function getIndexRoots($wbapi, $wbitem, $dbnames) {
+function siteLinks($item) {
     $params = array(
         'action' => 'wbgetentities',
         'format' => 'json',
-        'ids' => $wbitem,
+        'ids' => $item,
         'props' => 'sitelinks',
-        'sitefilter' => implode('|', $dbnames)
     );
-    $data = json_decode(file_get_contents($wbapi.'?'.http_build_query($params)), true);
+    $url = 'https://www.wikidata.org/w/api.php?'.http_build_query($params);
+    $data = json_decode(file_get_contents($url), true);
     $cats = array();
-    if (isset($data['entities']) && isset($data['entities'][$wbitem])) {
-        $item = $data['entities'][$wbitem];
-        if (isset($item['sitelinks'])) {
-            foreach ($item['sitelinks'] as $dbname => $sitelink) {
-                // Try to remove namespace
-                $parts = explode(':', $sitelink['title'], 2);
-                if (count($parts) === 2 && $parts[0] !== '' && $parts[1] !== '') {
-                    // Database fields use underscores
-                    $cats[$dbname] = str_replace(' ', '_', $parts[1]);
-                }
-            }
+    if (isset($data['entities'][$item]['sitelinks'])) {
+        foreach ($data['entities'][$item]['sitelinks'] as $sitelink) {
+            $cats[$sitelink['site']] = $sitelink['title'];
         }
     }
     return $cats;
