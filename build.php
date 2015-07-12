@@ -10,14 +10,15 @@ if (!isset($dbuser) || !isset($dbpass)) {
  * Return some metadata if this is a web request.
  */
 if (php_sapi_name() != 'cli') {
+    $siteInfo = json_decode(file_get_contents(__DIR__.'/sites.json'), true);
     $lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
     if (!array_key_exists($lang, $siteInfo)) {
         $lang = 'en';
     }
     header("Content-Type:application/json");
     $metadata = array(
-        'works_count' => count((array)json_decode(file_get_contents(getWorksFile($lang)))),
-        'last_modified' => date('Y-m-d H:i', filemtime(getCatFile($lang))),
+        'works_count' => count((array)json_decode(file_get_contents(getDataFilename('works', $lang)))),
+        'last_modified' => date('Y-m-d H:i', filemtime(getDataFilename('categories', $lang))),
         'category_label' => $siteInfo[$lang]['cat_label'],
         'category_root' => $siteInfo[$lang]['cat_root'],
     );
