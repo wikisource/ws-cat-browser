@@ -143,7 +143,7 @@ function buildOneLang( $pdo, $lang, $indexRoot, $catLabel, $indexNs ) {
     echo "Getting category data for '$lang' . . . ";
     $allCats = array();
     foreach ($validatedWorks as $indexTitle => $workTitle) {
-        $catTree = getAllCats($pdo, $workTitle, 0, array(), array(), $catLabel);
+        $catTree = getAllCats($pdo, $lang, $workTitle, 0, array(), array(), $catLabel);
         $allCats = array_map('array_unique', array_merge_recursive($allCats, $catTree));
     }
     echo "done\n";
@@ -193,7 +193,7 @@ function getValidatedWorks($pdo, $indexRoot, $indexNs) {
     return $out;
 }
 
-function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array(), $catLabel) {
+function getAllCats($pdo, $lang, $baseCat, $ns, $catList = array(), $tracker = array(), $catLabel) {
     $cats = getCats($pdo, $baseCat, $ns, $catLabel);
     if (empty($cats)) {
         return $catList;
@@ -207,13 +207,13 @@ function getAllCats($pdo, $baseCat, $ns, $catList = array(), $tracker = array(),
         //echo "Getting supercats of $baseCat via $cat.\n";
         $tracker_tag = $baseCat . ' - ' . $cat;
         if (in_array($tracker_tag, $tracker)) {
-            echo "A category loop has been detected.";
+            echo "A category loop has been detected in $lang:\n";
             print_r($tracker);
             continue;
         }
         array_push($tracker, $tracker_tag);
         // Add all of $cat's parents to the $catList.
-        $superCats = getAllCats($pdo, $cat, 14, $catList, $tracker, $catLabel);
+        $superCats = getAllCats($pdo, $lang, $cat, 14, $catList, $tracker, $catLabel);
         $catList = array_merge_recursive($catList, $superCats);
         // Initialise $cat as a parent if it's not there yet.
         if (!isset($catList[$cat])) {

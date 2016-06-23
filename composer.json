@@ -1,9 +1,9 @@
 {
-    "name": "samwilson/wikisource-cat-browser",
+    "name": "wikisource/ws-cat-browser",
     "type": "project",
     "description": "Wikisource category browser, showing all validated works.",
     "license": "MIT",
-    "homepage": "https://github.com/samwilson/wikisource-cat-browser",
+    "homepage": "https://github.com/wikisource/ws-cat-browser",
     "authors": [
         {
             "name": "Sam Wilson",
