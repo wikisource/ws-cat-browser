@@ -31,7 +31,7 @@ function addCats(allCats, $parent, cat, catLabel) {
         } else {
             var encodedCat = encodeURIComponent(subcat);
             title = "<a href=\"https://"+lang+".wikisource.org/wiki/"+encodedCat+"\" title='View on Wikisource'>"+title+"</a>"
-                + "<a href=\"http://wsexport.wmflabs.org/tool/book.php?lang="+lang+"&format=epub&page="+encodedCat+"\" class='epub'>"
+                + "<a href=\"http://tools.wmflabs.org/wsexport/tool/book.php?lang="+lang+"&format=epub&page="+encodedCat+"\" class='epub'>"
                 + " <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/15px-EPUB_silk_icon.svg.png'"
                 + "     title='Download EPUB' />"
                 + "</a>";

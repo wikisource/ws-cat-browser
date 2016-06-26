@@ -54,14 +54,20 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
                 <p>
                     This list was last updated at:
                     <span id="last-mod">y</span> <a href="http://time.is/UTC">UTC</a>.
+                    The above data is available in
+                    <a href="works<?php echo $suffix ?>.json"><tt>works<?php echo $suffix ?>.json</tt></a>
+                    and <a href="categories<?php echo $suffix ?>.json"><tt>categories<?php echo $suffix ?>.json</tt></a>.
+                </p>
+                <p>
+                    If you don't see your language's Wikisource listed above,
+                    please make sure it is present as a sitelink on Wikidata for
+                    the <a href="https://www.wikidata.org/wiki/Q1281">root category (Q1281)</a> and
+                    the <a href="https://www.wikidata.org/wiki/Q15634466">category for validated indexes (Q15634466)</a>.
                 </p>
                 <p>
                     For more information please see
                     <a href="https://github.com/wikisource/ws-cat-browser">the code</a> on Github
                     or contact <a href="https://meta.wikimedia.org/wiki/User:Samwilson">User:Samwilson</a>.
-                    The above data is available in
-                    <a href="works<?php echo $suffix ?>.json"><tt>works<?php echo $suffix ?>.json</tt></a>
-                    and <a href="categories<?php echo $suffix ?>.json"><tt>categories<?php echo $suffix ?>.json</tt></a>.
                 </p>
             </div>
         </div>
