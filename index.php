@@ -16,14 +16,23 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Wikisource (All Validated Works)</title>
         <link rel="stylesheet" href="//tools-static.wmflabs.org/cdnjs/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
-        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="style.css" />
         <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     </head>
     <body>
+        <div class="page-header">
+            <h1>
+                <span tt="wikisource"></span>
+                <small><span tt="all_validated_works"></span></small>
+            </h1>
+        </div>
 
         <div class="row">
-            <div class="large-12 columns">
-
+            <div class="large-4 columns">
+                <span tt='interface_language'></span>
+                <span id='interface_language_wrapper'></span>
+            </div>
+            <div class="large-8 columns">
                 <ul class="inline-list">
                     <li>Languages:</li>
                     <?php foreach ($siteInfo as $l => $info): ?>
@@ -36,8 +45,11 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
                     </li>
                     <?php endforeach ?>
                 </ul>
+            </div>
+        </div>
 
-                <h1>Wikisource <small>(All Validated Works)</small></h1>
+        <div class="row">
+            <div class="large-12 columns">
 
                 <?php if (isset($err)): ?>
                 <p class="alert-box alert"><?php echo $err ?></p>
@@ -77,7 +89,8 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
         </div>
         <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
-        <script src="js/app.js"></script>
+        <script src="//tools.wmflabs.org/tooltranslate/tt.js"></script>
+        <script src="scripts.js"></script>
         <script>
             var lang = '<?php echo $lang ?>';
         </script>

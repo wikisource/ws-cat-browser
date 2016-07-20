@@ -1,4 +1,20 @@
+/**
+ * Scripts for the Wikisource Category Browser.
+ */
+
+// Initialise Foundation.
 $(document).foundation();
+
+// Set up translation.
+$(function () {
+    tt = new ToolTranslation ( { debug:true, tool: 'ws-cat-browser',
+        callback : function () {
+            tt.addILdropdown ( $('#interface_language_wrapper') ) ; // This creates a <select> dropdown in the given wrapper, to dynamically change the interface language
+        }
+    });
+});
+
+// The main block, loading the categories and metadata.
 $(function() {
     var suffix = ""
     if (lang !== "en") {
@@ -23,6 +39,7 @@ $(function() {
 
     });
 });
+
 function addCats(allCats, $parent, cat, catLabel) {
     $.each(cat, function(i, subcat){
         var title = subcat.replace(/_/g, " ");
