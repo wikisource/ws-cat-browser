@@ -21,7 +21,7 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
     </head>
     <body><div class="container">
 
-        <div class="page-header row">
+        <div class="row">
             <div class="large-8 columns">
                 <h1>
                     <span tt="wikisource">Wikisource</span>
@@ -29,8 +29,8 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
                 </h1>
             </div>
             <div class="large-4 columns text-right">
-                <p tt='interface_language'>Interface language</p>
-                <p id='interface_language_wrapper'></p>
+                <span tt='interface_language'>Interface language</span>
+                <span id='interface_language_wrapper'></span>
             </div>
         </div>
 
@@ -38,7 +38,7 @@ $suffix = ($lang=='en') ? '' : '_'.$lang;
             <div class="large-12 columns">
 
                 <ul class="inline-list">
-                    <li>Languages:</li>
+                    <li tt="languages"></li>
                     <?php foreach ($siteInfo as $l => $info): ?>
                     <li>
                     <?php if ($lang == $l): ?>
