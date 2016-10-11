@@ -1,0 +1,8 @@
+{
+  "wikisource": "Wikisource",
+  "all-validated-works": "All validated works",
+  "languages": "languages",
+  "language-not-found": "The language '$1' has not yet been included. Please lodge an issue.",
+  "loading": "Categories loading, please wait&hellip;",
+  "introduction": "This page presents the categorisation of the $1 works on the $2 that are categorised, backed by scans, and have been validated (i.e. proofread by at least two contributors)."
+}

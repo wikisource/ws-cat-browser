@@ -12,5 +12,6 @@
         }
     ],
     "require": {
+        "krinkle/intuition": "^0.3"
     }
 }
