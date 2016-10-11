@@ -2,12 +2,13 @@
 require 'vendor/autoload.php';
 require 'config.php';
 
-$i18n = new Intuition('ws-cat-browser');
+$lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
+
+$i18n = new Intuition(['domain'=>'ws-cat-browser', 'lang'=>$lang]);
 $i18n->registerDomain('ws-cat-browser', __DIR__.'/i18n');
 
 $siteInfo = json_decode(file_get_contents(__DIR__.'/sites.json'), true);
 ksort($siteInfo);
-$lang = (isset($_GET['lang'])) ? htmlspecialchars($_GET['lang']) : 'en';
 if ( !array_key_exists($lang, $siteInfo)) {
     $err = $i18n->msg('language-not-found', ['variables'=>[$lang]]);
     $lang = 'en';
