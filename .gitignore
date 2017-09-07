@@ -1,4 +1,5 @@
 /nbproject
+/.idea
 /vendor
 /config.php
 /categories*.json

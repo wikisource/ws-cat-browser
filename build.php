@@ -35,7 +35,7 @@ if (!isset($siteInfo)) {
     file_put_contents(__DIR__.'/sites.json', json_encode($siteInfo));
     // Add the DSN.
     foreach ($siteInfo as $lang => $info) {
-        $siteInfo[$lang]['dsn'] = "mysql:dbname={$lang}wikisource_p;host={$lang}wikisource.labsdb";
+        $siteInfo[$lang]['dsn'] = "mysql:dbname={$lang}wikisource_p;host=wikireplica-analytics.eqiad.wmnet";
     }
 }
 
@@ -97,9 +97,9 @@ function getNamespaceInfo($lang) {
 }
 
 /**
- * 
- * @param type $item
- * @return type
+ * Get sitelinks for the given item ID.
+ * @param string $item Q-number.
+ * @return string[] Page names, keyed by site name
  */
 function siteLinks($item) {
     $params = array(
@@ -205,10 +205,14 @@ function getAllCats($pdo, $lang, $baseCat, $ns, $catList = array(), $tracker = a
     // For each cat, create an element in the output array.
     foreach ($cats as $cat) {
         //echo "Getting supercats of $baseCat via $cat.\n";
-        $tracker_tag = $baseCat . ' - ' . $cat;
+        $tracker_tag = [ $baseCat, $cat ];
         if (in_array($tracker_tag, $tracker)) {
-            echo "A category loop has been detected in $lang:\n";
-            print_r($tracker);
+            echo "A category loop has been detected in $lang:\n<graphviz>\ndigraph G {\n";
+            foreach ($tracker as $trackerItem) {
+                echo '"'.str_replace('"', '\"', $trackerItem[0])
+                    .'" -> "'.str_replace('"', '\"',$trackerItem[1]).'"'."\n";
+            }
+            echo "}\n</graphviz>";
             continue;
         }
         array_push($tracker, $tracker_tag);

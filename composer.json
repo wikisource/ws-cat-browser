@@ -8,10 +8,10 @@
         {
             "name": "Sam Wilson",
             "email": "sam@samwilson.id.au",
-            "homepage": "http://samwilson.id.au"
+            "homepage": "https://samwilson.id.au"
         }
     ],
     "require": {
-        "krinkle/intuition": "^0.3"
+        "krinkle/intuition": "^0.6"
     }
 }
