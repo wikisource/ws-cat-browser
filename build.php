@@ -35,7 +35,7 @@ if (!isset($siteInfo)) {
     file_put_contents(__DIR__.'/sites.json', json_encode($siteInfo));
     // Add the DSN.
     foreach ($siteInfo as $lang => $info) {
-        $siteInfo[$lang]['dsn'] = "mysql:dbname={$lang}wikisource_p;host=wikireplica-analytics.eqiad.wmnet";
+        $siteInfo[$lang]['dsn'] = "mysql:dbname={$lang}wikisource_p;host={$lang}wikisource.analytics.db.svc.eqiad.wmflabs";
     }
 }
 
