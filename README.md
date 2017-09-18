@@ -12,7 +12,7 @@ If your Wikisource is missing, please add relevant sitelinks to the following it
 2. the category for [validated indices Q15634466](https://www.wikidata.org/wiki/Q15634466)
    (e.g. `Index_Validated`, `Pagine_indice_SAL_100%`).
 
-Alternatively, you can [create a issue](https://github.com/wikisource/ws-cat-browser/issues/new)
+Alternatively, you can [create a task on Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?project=wikisource)
 and just tell us the names of the above categories.
 
 ## Tracking
