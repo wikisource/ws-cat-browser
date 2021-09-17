@@ -1,0 +1,7 @@
+framework:
+    cache:
+        prefix_seed: ws-cat-browser
+        pools:
+            cache.replicas:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 600

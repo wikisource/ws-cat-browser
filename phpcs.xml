@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="app">
+	<rule ref="./vendor/mediawiki/mediawiki-codesniffer/MediaWiki" />
+
+	<!-- Allow @Route annotations -->
+	<rule ref="MediaWiki.Commenting.FunctionAnnotations.UnrecognizedAnnotation">
+		<exclude-pattern>./src/Controller/</exclude-pattern>
+	</rule>
+
+	<file>.</file>
+	<exclude-pattern>./vendor/</exclude-pattern>
+	<exclude-pattern>./var/</exclude-pattern>
+	<exclude-pattern>./bin/.phpunit/</exclude-pattern>
+	<exclude-pattern>./.phan/</exclude-pattern>
+</ruleset>

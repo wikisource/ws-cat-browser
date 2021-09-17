@@ -1,9 +1,9 @@
 /nbproject
 /.idea
+/.env.local
 /vendor
-/config.php
-/categories*.json
-/works*.json
-/dumps
-/sites.json
+/var
+/public/categories*.json
+/public/works*.json
+/public/sites.json
 

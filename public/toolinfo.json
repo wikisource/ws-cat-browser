@@ -1,8 +1,8 @@
 {
     "name" : "ws-cat-browser",
     "title" : "Wikisource category browser",
-    "description" : " A generator for a tree browser for categories of validated Wikisource works, in multiple languages.",
-    "url" : "http://tools.wmflabs.org/ws-cat-browser/",
+    "description" : "A generator for a tree browser for categories of validated Wikisource works, in multiple languages.",
+    "url" : "https://ws-cat-browser.toolforge.org/",
     "keywords" : "wikisource, categories, ebooks, epub",
     "author" : "Sam Wilson",
     "repository" : "https://github.com/wikisource/ws-cat-browser.git"
