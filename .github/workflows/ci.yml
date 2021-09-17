@@ -1,0 +1,36 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    env:
+      APP_ENV: test
+    
+    strategy:
+      matrix:
+        php: [ '7.2', '7.3', '7.4', '8.0' ]
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{matrix.php}}
+        coverage: none
+        extensions: ast
+
+    - name: Install
+      run: |
+        composer install
+
+    - name: Test
+      run: |
+        composer test
+        git status
+        git status | grep "nothing to commit, working tree clean"
