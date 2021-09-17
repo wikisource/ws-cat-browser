@@ -1,7 +1,7 @@
 Wikisource category browser
 ===========================
 
-This script is running at http://tools.wmflabs.org/ws-cat-browser/
+This script is running at https://ws-cat-browser.toolforge.org/
 and is updated weekly.
 
 ## Missing languages?
