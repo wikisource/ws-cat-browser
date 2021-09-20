@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -39,26 +40,40 @@ class BuildCommand extends Command {
 		$this->wsCatBrowser = $wsCatBrowser;
 	}
 
+	public function configure() {
+		$this->addOption(
+			'lang', 'l', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+			'Wikisource language code.'
+		);
+	}
+
 	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 * @return int
 	 */
 	public function execute( InputInterface $input, OutputInterface $output ) {
+		$timeStart = microtime( true );
 		$this->out = $output;
 
 		$siteInfo = $this->getSiteInfo();
-
 		$this->out->writeln( 'Writing sites.json' );
 		file_put_contents( $this->wsCatBrowser->getSitesFilename(), json_encode( $siteInfo ) );
 
-		/*
-		 * For each site, build categories.json and works.json
-		 */
+		// For each site, build categories.json and works.json
+		$langs = $input->getOption( 'lang' );
 		foreach ( $siteInfo as $lang => $info ) {
+			if ( $langs && !in_array( $lang, $langs ) ) {
+				$this->out->writeln( 'Skipping ' . $lang );
+				continue;
+			}
 			$db = $this->replicasClient->getConnection( $lang === 'www' ? 'sourceswiki' : $lang . 'wikisource' );
 			$this->buildOneLang( $db, $lang, $info['index_cat'], $info['cat_label'], $info['index_ns'] );
 		}
+
+		// Report completion.
+		$minutes = round( ( microtime( true ) - $timeStart ) / 60, 1 );
+		$this->out->writeln( "Done. Total time: $minutes minutes." );
 		return Command::SUCCESS;
 	}
 
